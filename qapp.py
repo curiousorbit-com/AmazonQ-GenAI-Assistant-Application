@@ -181,12 +181,15 @@ def main():
     with open('config.yaml', 'r') as f:
         config = yaml.safe_load(f)
 
-    sso_start_url = config['config']['sso_start_url']
-    sso_region = config['config']['sso_region']
-    account_id = config['config']['account_id']
-    role_name = config['config']['role_name']
-    aws_region = config['config']['aws_region']
-    environment = config['config']['environment']
+    sso_start_url = config['sso_config']['sso_start_url']
+    sso_region = config['sso_config']['sso_region']
+    account_id = config['sso_config']['account_id']
+    role_name = config['sso_config']['role_name']
+    aws_region = config['deployment_config']['aws_region']
+    environment = config['deployment_config']['environment']
+    q_application_role_arn = config['deployment_config']['q_application_role_arn']
+    q_application_webcrawler_data_source_arn = config['deployment_config']['q_application_webcrawler_data_source_arn']
+    q_application_web_experience_arn = config['deployment_config']['q_application_web_experience_arn']
 
     # Connect to the demo account using AWS Identity Center
     boto3_session = get_boto3_session(sso_start_url, sso_region, account_id, role_name, region=aws_region,
@@ -206,7 +209,7 @@ def main():
         print('A Q Business application with that name does not exist. Creating it now.')
         # Before creating the Q application, check to make sure one doesn't already exist with the same name.
         q_app_arn, q_app_id = create_q_application(q_client, 'A Twitch Demo Application', Q_APP_NAME,
-                                                   q_business_role_arn, environment)
+                                                   q_application_role_arn, environment)
 
     # Check to see if an index already exists, if not create it. If it does, grab the info we need and continue.
     q_index_exists, q_index_id = list_q_indexes(q_client, q_app_id)

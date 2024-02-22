@@ -1,0 +1,11 @@
+sso_config:
+  sso_start_url: <Add IAM Identity Center URL - including https://>
+  sso_region: <Add the AWS region where Identity Center is running>
+  account_id: <Add the 12-digit account ID where you'd like to deploy AmazonQ for business
+  role_name: <Add the IAM role you'd like to use to access your AWS account>
+deployment_config:
+  aws_region: <Add the AWS region identifier where you'd like to deploy AmazonQ>
+  q_application_role_arn: <Add the ARN for the service role>
+  q_application_webcrawler_data_source_arn: <Add the ARN for the webcrawler role>
+  q_application_web_experience_arn: <Add the ARN for the web experience role>
+  environment: dev
