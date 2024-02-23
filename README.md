@@ -18,6 +18,55 @@ NOTES:
 - Make sure you review the requirements.txt file before attempting to deploy the solution.
 - You can find information about the IAM Role mentioned above in the [AWS documentation](https://docs.aws.amazon.com/amazonq/latest/business-use-dg/iam-roles.html)
 
+## Configuration file
+All configuration information required by the script is stored in a YAML file called config.yaml.
+
+As part of the project, we included a sample-config.yaml file. You need to update this file prior to deployment.
+
+Below is an example of the current configuration file and an explanation of the values.
+
+```
+sso_config:
+  sso_start_url: <Add IAM Identity Center URL - including https://>
+  sso_region: <Add the AWS region where Identity Center is running>
+  account_id: <Add the 12-digit account ID where you'd like to deploy AmazonQ for business
+  role_name: <Add the IAM role you'd like to use to access your AWS account>
+deployment_config:
+  aws_region: <Add the AWS region identifier where you'd like to deploy AmazonQ>
+  q_app_name: AQBusinessPOC
+  q_app_description: A POC for QBusiness
+  q_index_name: AQBusinessIndexPOC
+  q_index_description: A POC Index for QBusiness
+  q_retriever_name: AQBusinessRetrieverPOC
+  q_retriever_description: A POC Retriever for QBusiness
+  q_application_role_arn: <Add the ARN for the service role>
+  q_application_webcrawler_data_source_arn: <Add the ARN for the webcrawler role>
+  q_application_web_experience_arn: <Add the ARN for the web experience role>
+  environment: dev
+```
+
+The section entitled 'sso-config' contains the information required to use AWS IAM Identity Center to authenticate you 
+before deployment.
+
+- sso_start_url: The HTTPS address of your AWS IAM Identity Center instance
+- sso_region: The AWS region where your Identity Center instance is running
+- account_id: The 12-digit AWS account ID where you will be deploying the solution
+- role_name: The name of the IAM Role you'll be assuming to perform the deployment
+
+The section entitled 'deployment_config' contains the information required for the deployment of the Amazon Q application.
+
+- aws_region: The AWS region where you would like to deploy AmazonQ
+- q_app_name: The name of your QBusiness application - spaces are not allowed
+- q_app_description: The description of your QBusiness application
+- q_index_name: The name of your QBusiness Index - spaces are not allowed
+- q_index_description: The description of your QBusiness application
+- q_retriever_name: The name of your QBusiness retriever - spaces are not allowed
+- q_retriever_description: The description of your QBusiness retriever - not currently used, but must be present
+- q_application_role_arn: The ARN of the IAM role used by your QBusiness application
+- q_application_webcrawler_data_source_arn: The ARN of the IAM role used by your QBusiness web crawler - not currently used, but must be present
+- q_application_web_experience_arn: The ARN of the IAM role used by your QBusiness web experience - not currently used, but must be present
+- environment: The name of your environment - defaults to dev
+
 ## TODO
 - [X] Create a Boto3 session using SSO
 - [X] Create a Boto3 client connection to Amazon Q
