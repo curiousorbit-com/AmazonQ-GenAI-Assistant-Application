@@ -5,6 +5,12 @@ sso_config:
   role_name: <Add the IAM role you'd like to use to access your AWS account>
 deployment_config:
   aws_region: <Add the AWS region identifier where you'd like to deploy AmazonQ>
+  q_app_name: AQBusinessPOC
+  q_app_description: A POC for QBusiness
+  q_index_name: AQBusinessIndexPOC
+  q_index_description: A POC Index for QBusiness
+  q_retriever_name: AQBusinessRetrieverPOC
+  q_retriever_description: A POC Retriever for QBusiness
   q_application_role_arn: <Add the ARN for the service role>
   q_application_webcrawler_data_source_arn: <Add the ARN for the webcrawler role>
   q_application_web_experience_arn: <Add the ARN for the web experience role>

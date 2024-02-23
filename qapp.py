@@ -4,17 +4,14 @@ import botocore
 import yaml
 from aws_sso_lib import get_boto3_session
 
-Q_APP_NAME = 'ATwitchDemoApp'
-Q_INDEX_NAME = 'ATwitchDemoIndex'
 
-
-def list_q_apps(client):
+def list_q_apps(client, q_app_name):
     app_exists = False
     app_id = ''
     try:
         response = client.list_applications()
         for item in response['applications']:
-            if item['displayName'] == Q_APP_NAME:
+            if item['displayName'] == q_app_name:
                 app_exists = True
                 app_id = item['applicationId']
     except botocore.exceptions.ClientError as error:
@@ -23,7 +20,7 @@ def list_q_apps(client):
     return app_exists, app_id
 
 
-def list_q_indexes(client, q_app_id):
+def list_q_indexes(client, q_app_id, q_index_name):
     q_index_exists = False
     q_index_id = ''
     try:
@@ -31,7 +28,7 @@ def list_q_indexes(client, q_app_id):
             applicationId=q_app_id
         )
         for item in response['indices']:
-            if item['displayName'] == Q_INDEX_NAME:
+            if item['displayName'] == q_index_name:
                 q_index_exists = True
                 q_index_id = item['indexId']
     except botocore.exceptions.ClientError as error:
@@ -40,7 +37,7 @@ def list_q_indexes(client, q_app_id):
     return q_index_exists, q_index_id
 
 
-def list_q_retrievers(client, q_app_id):
+def list_q_retrievers(client, q_app_id, q_retriever_name):
     q_retriever_exists = False
     q_retriever_id = ''
 
@@ -49,7 +46,7 @@ def list_q_retrievers(client, q_app_id):
             applicationId=q_app_id
         )
         for item in response['retrievers']:
-            if item['displayName'] == 'ATwitchDemoRetriever':
+            if item['displayName'] == q_retriever_name:
                 q_retriever_exists = True
                 q_retriever_id = item['retrieverId']
     except botocore.exceptions.ClientError as error:
@@ -190,6 +187,14 @@ def main():
     q_application_role_arn = config['deployment_config']['q_application_role_arn']
     q_application_webcrawler_data_source_arn = config['deployment_config']['q_application_webcrawler_data_source_arn']
     q_application_web_experience_arn = config['deployment_config']['q_application_web_experience_arn']
+    q_app_name = config['deployment_config']['q_app_name']
+    q_app_description = config['deployment_config']['q_app_description']
+    q_index_name = config['deployment_config']['q_index_name']
+    q_index_description = config['deployment_config']['q_index_description']
+    q_retriever_name = config['deployment_config']['q_retriever_name']
+    q_web_title = config['deployment_config']['q_web_title']
+    q_web_subtitle = config['deployment_config']['q_web_subtitle']
+    q_web_welcome_msg = config['deployment_config']['q_web_welcome_msg']
 
     # Connect to the demo account using AWS Identity Center
     boto3_session = get_boto3_session(sso_start_url, sso_region, account_id, role_name, region=aws_region,
@@ -200,7 +205,7 @@ def main():
 
     # Check to see if a QBusiness application with the defined name already exists. If it doesn't create it
     # if it does, grab the info we need and continue
-    app_exists, app_id = list_q_apps(q_client)
+    app_exists, app_id = list_q_apps(q_client, q_app_name)
     if app_exists:
         print('A Q Business application with that name already exists.')
         # Since the application already exists, we'll grab the ARN and ID, so we can continue with the script
@@ -208,18 +213,18 @@ def main():
     else:
         print('A Q Business application with that name does not exist. Creating it now.')
         # Before creating the Q application, check to make sure one doesn't already exist with the same name.
-        q_app_arn, q_app_id = create_q_application(q_client, 'A Twitch Demo Application', Q_APP_NAME,
-                                                   q_application_role_arn, environment)
+        q_app_arn, q_app_id = create_q_application(q_client, q_app_description, q_app_name, q_application_role_arn,
+                                                   environment)
 
     # Check to see if an index already exists, if not create it. If it does, grab the info we need and continue.
-    q_index_exists, q_index_id = list_q_indexes(q_client, q_app_id)
+    q_index_exists, q_index_id = list_q_indexes(q_client, q_app_id, q_index_name)
     if q_index_exists:
         print('A Q Index with that name already exists.')
     else:
         print('A Q Index with that name does not exist. Creating it now.')
         # Before creating the Q Index, check to make sure one doesn't already exist with the same name.
-        q_index_arn, q_index_id = create_q_index(q_client, q_app_id, 1, 'A Twitch Demo Index',
-                                                 'ATwitchDemoIndex', environment)
+        q_index_arn, q_index_id = create_q_index(q_client, q_app_id, 1, q_index_description, q_index_name,
+                                                 environment)
 
         # We need to wait on the Index, before we can create the retriever
         index_created = False
@@ -238,12 +243,12 @@ def main():
             time.sleep(30)
 
     # Check to see if the Q retriever already exists, if not create it. If it does, grab the info we need and continue.
-    q_retriever_exists, q_retriever_id = list_q_retrievers(q_client, q_app_id)
+    q_retriever_exists, q_retriever_id = list_q_retrievers(q_client, q_app_id, q_retriever_name)
     if q_retriever_exists:
         print('A Q Retriever with that name already exists.')
     else:
         print('A Q Retriever with that name does not exist. Creating it now.')
-        create_q_retriever(q_client, q_app_id, q_index_id, 'ATwitchDemoRetriever', 'NATIVE_INDEX',
+        create_q_retriever(q_client, q_app_id, q_index_id, q_retriever_name, 'NATIVE_INDEX',
                            environment)
 
     # Create a web experience
@@ -252,8 +257,8 @@ def main():
         print('A Q Web Experience with that name already exists.')
     else:
         print('A Q Web Experience does not exist. Creating it now.')
-        create_q_web_experience(q_client, q_app_id, 'DISABLED', 'A Twitch Demo Web Experience',
-                                'A Twitch Demo Web Experience', 'Say \'Hi\' to Gordo - he\'s here to help!', environment)
+        create_q_web_experience(q_client, q_app_id, 'DISABLED', q_web_subtitle, q_web_title,
+                                q_web_welcome_msg, environment)
 
     # Close the client
     q_client.close()
