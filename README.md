@@ -85,15 +85,19 @@ a subset of the data on the site
 - [X] Add logic to avoid the ongoing deletion/creation process used during the stream!
 - [ ] Create required CFN templates
     - [ ] IAM Resources
-        - [ ] Application Role
-        - [ ] Data source Role
-        - [ ] Web experience role
-    - [ ] Secrets Manager resources
+        - [X] Application role
+        - [X] Web experience role
+        - [X] Web crawler connector role
+        - [X] Slack connector role
+        - [ ] Jira connector role
+    - [X] Secrets Manager resources
+      - [X] Slack secret
+      - [X] Jira secret
     - [ ] S3 resources
     - [ ] CMK
 - [ ] Look into Validation exception errors in boto3 - can we get a useful message?
 - [ ] Add a web Q crawler to the application - deployed via boto3
 - [ ] Add additional data sources
     - [ ] Add an Identity crawler - controls what we can query via the AI Assistant
-    - [ ] Add a Slack Q crawler
+    - [X] Add a Slack Q crawler
     - [ ] Add a JIRA Q crawler
